@@ -1,5 +1,6 @@
 <template>
   <div class="example">
+    <github-corner />
 
     <h2 class="name">
       vue-virtual-scroll-list
@@ -22,13 +23,11 @@
       </span>
     </div>
 
-    <div class="head">
-      <img alt="Travis CI Status" src="https://travis-ci.org/tangbc/vue-virtual-scroll-list.svg?branch=master"/>
-      <!-- <img alt="Code Coverage" src="https://codecov.io/gh/tangbc/vue-virtual-scroll-list/branch/master/graph/badge.svg"/> -->
+    <!-- <div class="head">
       <img alt="NPM downloads" src="https://img.shields.io/npm/dm/vue-virtual-scroll-list.svg">
       <img alt="NPM version" src="https://img.shields.io/npm/v/vue-virtual-scroll-list.svg"/>
       <img alt="Package quality" src="https://npm.packagequality.com/shield/vue-virtual-scroll-list.svg">
-    </div>
+    </div> -->
 
     <h3 class="title">What's news in v2.0</h3>
     <ul>
@@ -71,7 +70,7 @@ export default {
   img {
     margin-right: .5em;
     width: auto;
-    height: 26px;
+    height: 24px;
   }
 }
 .title {

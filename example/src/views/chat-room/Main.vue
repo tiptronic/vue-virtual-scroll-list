@@ -7,11 +7,11 @@
     <div class="main">
       <div class="list-container">
         <virtual-list v-show="!!messages.length" class="stream scroll-touch" :class="{ overflow: overflow }" ref="vsl"
-          :size="80"
-          :keeps="30"
           :data-key="'sid'"
           :data-sources="messages"
           :data-component="messageComponent"
+
+          :estimate-size="100"
           :item-class="'stream-item'"
           :item-class-add="addItemClass"
           @resized="onItemRendered"
@@ -93,8 +93,6 @@ export default {
           this.finished = true
           return
         }
-
-        this.setVirtualListToOffset(1)
 
         const sids = getSids(messages)
         this.messages = messages.concat(this.messages)

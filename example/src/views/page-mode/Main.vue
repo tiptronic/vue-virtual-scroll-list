@@ -1,36 +1,36 @@
 <template>
   <div class="example">
     <github-corner />
-    <introduction description="The size of each item is equal." />
+    <introduction description="In <code>page-mode</code> virtual list using global document to scroll through the list." />
 
     <div class="example-content">
-      <tab v-on:tab-change="onTabChange" />
-
-      <div v-show="isShowView">
-        <virtual-list class="list scroll-touch"
+      <div>
+        <virtual-list class="list-page scroll-touch" ref="vsl"
           :data-key="'id'"
           :data-sources="items"
           :data-component="itemComponent"
-
-          :estimate-size="50"
-          :item-class="'list-item-fixed'"
+          :estimate-size="135"
+          :item-class="'list-item-page'"
+          :page-mode="true"
+          v-on:totop="totop"
+          v-on:tobottom="tobottom"
         />
+        <div class="bottom">
+          <h2>This is page footer</h2>
+        </div>
       </div>
-
-      <codeblock v-show="!isShowView" />
     </div>
   </div>
 </template>
 
 <script>
 import Item from './Item'
-import Code from './Code'
 
 import { Random } from '../../common/mock'
+import getSentences from '../../common/sentences'
 import genUniqueId from '../../common/gen-unique-id'
-import { TAB_TYPE, DEFAULT_TAB } from '../../common/const'
 
-const TOTAL_COUNT = 10000
+const TOTAL_COUNT = 1000
 
 const DataItems = []
 let count = TOTAL_COUNT
@@ -40,49 +40,51 @@ while (count--) {
     index,
     name: Random.name(),
     id: genUniqueId(index),
+    desc: getSentences()
   })
 }
 
 export default {
-  name: 'fix-size',
+  name: 'page-mode',
 
   components: {
-    codeblock: Code
   },
 
   data () {
     return {
-      total: TOTAL_COUNT.toLocaleString(),
       items: DataItems,
       itemComponent: Item,
-      isShowView: DEFAULT_TAB === TAB_TYPE.VIEW
     }
   },
 
   methods: {
-    onTabChange (type) {
-      this.isShowView = type === TAB_TYPE.VIEW
+    totop () {
+      console.log('reach totop')
+    },
+    tobottom () {
+      console.log('reach tobottom')
     }
   }
 }
 </script>
 
 <style lang="less">
-.list {
+.list-page {
   width: 100%;
-  height: 500px;
   border: 2px solid;
   border-radius: 3px;
   overflow-y: auto;
   border-color: dimgray;
 
-  .list-item-fixed {
+  .list-item-page {
     display: flex;
     align-items: center;
-    padding: 0 1em;
-    height: 60px;
+    padding: 1em;
     border-bottom: 1px solid;
     border-color: lightgray;
   }
+}
+.bottom {
+  padding: 2em 0;
 }
 </style>

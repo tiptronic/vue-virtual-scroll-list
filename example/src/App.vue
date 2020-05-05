@@ -13,6 +13,8 @@
       <span class="line">|</span>
       <router-link to="/keep-state">keep state</router-link>
       <span class="line">|</span>
+      <router-link to="/page-mode">page mode</router-link>
+      <span class="line">|</span>
       <router-link to="/chat-room">chat room</router-link>
     </div>
     <router-view/>
@@ -22,6 +24,10 @@
 <style lang="less">
 body {
   font-size: 18px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: 0px;
 }
 
 #app {
@@ -41,11 +47,11 @@ body {
   height: 40px;
   display: flex;
   align-items: center;
-  padding-left: 2em;
+  padding-left: 1em;
+  white-space: nowrap;
+  overflow-x: auto;
   @media (max-width: 640px) {
     padding: 0;
-    overflow-x: auto;
-    white-space: nowrap;
     position: relative;
     background-color: unset;
     color: unset;

@@ -3,15 +3,6 @@
  */
 
 export const VirtualProps = {
-  size: {
-    type: Number,
-    required: true
-  },
-  keeps: {
-    type: Number,
-    required: true
-  },
-
   dataKey: {
     type: String,
     required: true
@@ -24,10 +15,43 @@ export const VirtualProps = {
     type: [Object, Function],
     required: true
   },
+
+  keeps: {
+    type: Number,
+    default: 30
+  },
   extraProps: {
     type: Object
   },
+  estimateSize: {
+    type: Number,
+    default: 50
+  },
 
+  direction: {
+    type: String,
+    default: 'vertical' // the other value is horizontal
+  },
+  start: {
+    type: Number,
+    default: 0
+  },
+  offset: {
+    type: Number,
+    default: 0
+  },
+  topThreshold: {
+    type: Number,
+    default: 0
+  },
+  bottomThreshold: {
+    type: Number,
+    default: 0
+  },
+  pageMode: {
+    type: Boolean,
+    default: false
+  },
   rootTag: {
     type: String,
     default: 'div'
@@ -40,28 +64,9 @@ export const VirtualProps = {
     type: String,
     default: ''
   },
-
-  direction: {
-    type: String,
-    default: 'vertical' // the other value is horizontal
+  wrapStyle: {
+    type: Object
   },
-  topThreshold: {
-    type: Number,
-    default: 0
-  },
-  bottomThreshold: {
-    type: Number,
-    default: 0
-  },
-  start: {
-    type: Number,
-    default: 0
-  },
-  offset: {
-    type: Number,
-    default: 0
-  },
-
   itemTag: {
     type: String,
     default: 'div'
@@ -73,7 +78,9 @@ export const VirtualProps = {
   itemClassAdd: {
     type: Function
   },
-
+  itemStyle: {
+    type: Object
+  },
   headerTag: {
     type: String,
     default: 'div'
@@ -81,6 +88,9 @@ export const VirtualProps = {
   headerClass: {
     type: String,
     default: ''
+  },
+  headerStyle: {
+    type: Object
   },
   footerTag: {
     type: String,
@@ -90,10 +100,8 @@ export const VirtualProps = {
     type: String,
     default: ''
   },
-
-  disabled: {
-    type: Boolean,
-    default: false
+  footerStyle: {
+    type: Object
   }
 }
 

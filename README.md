@@ -11,9 +11,9 @@
   <a href="https://npmjs.com/package/vue-virtual-scroll-list">
     <img alt="NPM version" src="https://img.shields.io/npm/v/vue-virtual-scroll-list.svg"/>
   </a>
-  <a href="https://vuejs.org/">
+  <!-- <a href="https://vuejs.org/">
     <img alt="Vue version" src="https://img.shields.io/badge/vue-%3E=2.3.0-brightgreen.svg"/>
-  </a>
+  </a> -->
   <a href="http://packagequality.com/#?package=vue-virtual-scroll-list">
     <img alt="Package quality" src="https://npm.packagequality.com/shield/vue-virtual-scroll-list.svg">
   </a>
@@ -34,16 +34,18 @@
 
 ## Advantages
 
-* Tiny, simple structure and very easy to use.
+* Only 3 required props, simple and very easy to use.
 
 * Big data list with high render performance and efficient.
 
-* You don't have to care about each item size, it will calculate automatic.
+* You don't have to care about item size, it will calculate automatic.
 
 
 ## Live demo
 
 https://tangbc.github.io/vue-virtual-scroll-list
+
+https://codesandbox.io/s/live-demo-virtual-list-e1ww1
 
 
 ## What's new in v2.0
@@ -64,8 +66,6 @@ Root component:
 <template>
   <div>
     <virtual-list
-      :size="60" // You dont know? no problem, just pass a estimate value!
-      :keeps="30"
       :data-key="'uid'"
       :data-sources="items"
       :data-component="itemComponent"
@@ -126,8 +126,6 @@ More usages or getting start you can refer to these clearly [examples](https://g
 
 | **&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;** | **Type**  | **Description**                                                                                                                              |
 |------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| `size`           | Number        | Each item size, you don't have to know the accurate, just simply pass an **estimate** or **average** value.                                     |
-| `keeps`          | Number        | How many items you are expecting the list to keep rendering in the real dom.                                                                      |
 | `data-key`       | String        | The unique key get from `data-sources` in each data object, its value **must be unique** in `data-sources`, it is used for identifying item size. |
 | `data-sources`   | Array[Object] | The source array built for list, each array data must be an object and has an unique key for `data-key` property.                                 |
 | `data-component` | Component     | The render item component created / declared by vue, and it will use the data object in `datas-sources` as render prop and named: `source`.       |
@@ -139,16 +137,53 @@ More usages or getting start you can refer to these clearly [examples](https://g
   <p></p>
   <table>
     <tr>
-      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Props&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Props&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
       <th>Type</th>
       <th>Default</th>
       <th>Description</th>
     </tr>
     <tr>
+      <td><code>keeps</code></td>
+      <td>Number</td>
+      <td>30</td>
+      <td>How many items you are expecting the virtual list to keep rendering in the real dom.</td>
+    </tr>
+    <tr>
       <td><code>extra-props</code></td>
       <td>Object</td>
       <td>{}</td>
-      <td>Extra props pass to item component, notice: <code>index</code> and <code>source</code> are both occupied.</td>
+      <td>Extra props assign to item component that are not in <code>data-sources</code>. Notice: <code>index</code> and <code>source</code> are both occupied inner.</td>
+    </tr>
+    <tr>
+      <td><code>estimate-size</code></td>
+      <td>Number</td>
+      <td>50</td>
+      <td>The estimate size of each item, if it is closer to the average size, the scrollbar length looks more accurately. It is recommended to assign the average that calculate by yourself.</td>
+    </tr>
+  </table>
+</details>
+
+<details>
+  <summary><strong>Uncommonly used</strong></summary>
+  <p></p>
+  <table>
+    <tr>
+      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Props&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>start</code></td>
+      <td>Number</td>
+      <td>0</td>
+      <td>Setting scroll position stay start index.</td>
+    </tr>
+    <tr>
+      <td><code>offset</code></td>
+      <td>Number</td>
+      <td>0</td>
+      <td>Setting scroll position stay offset.</td>
     </tr>
     <tr>
       <td><code>scroll</code></td>
@@ -168,36 +203,35 @@ More usages or getting start you can refer to these clearly [examples](https://g
       <td></td>
       <td>Emited when scrolled to bottom or right, no param.</td>
     </tr>
-  </table>
-</details>
-
-<details>
-  <summary><strong>Uncommonly used</strong></summary>
-  <p></p>
-  <table>
-    <tr>
-      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Props&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td><code>start</code></td>
-      <td>Number</td>
-      <td>0</td>
-      <td>Setting scroll stay start index.</td>
-    </tr>
-    <tr>
-      <td><code>offset</code></td>
-      <td>Number</td>
-      <td>0</td>
-      <td>Setting scroll stay offset.</td>
-    </tr>
     <tr>
       <td><code>resized</code></td>
       <td>Event</td>
       <td></td>
-      <td>Emited when each item resized (mounted), param <code>(id, size)</code>.</td>
+      <td>Emited when item resized (mounted), param <code>(id, size)</code>.</td>
+    </tr>
+    <tr>
+      <td><code>direction</code></td>
+      <td>String</td>
+      <td>vertical</td>
+      <td>Scroll direction, available values are <code>vertical</code> and <code>horizontal</code></td>
+    </tr>
+    <tr>
+      <td><code>page-mode</code></td>
+      <td>Boolean</td>
+      <td>false</td>
+      <td>Let virtual list using global document to scroll through the list.</td>
+    </tr>
+    <tr>
+      <td><code>top-threshold</code></td>
+      <td>Number</td>
+      <td>0</td>
+      <td>The threshold to emit <code>totop</code> event, attention to multiple calls.</td>
+    </tr>
+    <tr>
+      <td><code>bottom-threshold</code></td>
+      <td>Number</td>
+      <td>0</td>
+      <td>The threshold to emit <code>tobottom</code> event, attention to multiple calls.</td>
     </tr>
     <tr>
       <td><code>root-tag</code></td>
@@ -209,19 +243,25 @@ More usages or getting start you can refer to these clearly [examples](https://g
       <td><code>wrap-tag</code></td>
       <td>String</td>
       <td>div</td>
-      <td>List wrapper element tag name.</td>
-    </tr>
-    <tr>
-      <td><code>item-tag</code></td>
-      <td>String</td>
-      <td>div</td>
-      <td>Item wrapper element tag name.</td>
+      <td>List wrapper element <code>(role=group)</code> tag name.</td>
     </tr>
     <tr>
       <td><code>wrap-class</code></td>
       <td>String</td>
       <td></td>
       <td>List wrapper element class name.</td>
+    </tr>
+    <tr>
+      <td><code>wrap-style</code></td>
+      <td>Object</td>
+      <td>{}</td>
+      <td>List wrapper element inline style.</td>
+    </tr>
+    <tr>
+      <td><code>item-tag</code></td>
+      <td>String</td>
+      <td>div</td>
+      <td>Item wrapper element <code>(role=item)</code> tag name.</td>
     </tr>
     <tr>
       <td><code>item-class</code></td>
@@ -236,16 +276,16 @@ More usages or getting start you can refer to these clearly [examples](https://g
       <td>A function that you can return extra class (String) to item wrapper element, param <code>(index)</code>.</td>
     </tr>
     <tr>
+      <td><code>item-style</code></td>
+      <td>Object</td>
+      <td>{}</td>
+      <td>Item wrapper element inline style.</td>
+    </tr>
+    <tr>
       <td><code>header-tag</code></td>
       <td>String</td>
       <td>div</td>
-      <td>For using header slot, header slot wrapper element tag name.</td>
-    </tr>
-    <tr>
-      <td><code>footer-tag</code></td>
-      <td>String</td>
-      <td>div</td>
-      <td>For using footer slot, footer slot wrapper element tag name.</td>
+      <td>For using header slot, header slot wrapper element <code>(role=header)</code> tag name.</td>
     </tr>
     <tr>
       <td><code>header-class</code></td>
@@ -254,53 +294,81 @@ More usages or getting start you can refer to these clearly [examples](https://g
       <td>For using header slot, header slot wrapper element class name.</td>
     </tr>
     <tr>
+      <td><code>header-style</code></td>
+      <td>Object</td>
+      <td>{}</td>
+      <td>For using header slot, header slot wrapper element inline style.</td>
+    </tr>
+    <tr>
+      <td><code>footer-tag</code></td>
+      <td>String</td>
+      <td>div</td>
+      <td>For using footer slot, footer slot wrapper element <code>(role=footer)</code> tag name.</td>
+    </tr>
+    <tr>
       <td><code>footer-class</code></td>
       <td>String</td>
       <td></td>
       <td>For using footer slot, footer slot wrapper element class name.</td>
     </tr>
     <tr>
-      <td><code>direction</code></td>
-      <td>String</td>
-      <td>vertical</td>
-      <td>Scroll direction, available values are <code>vertical</code> and <code>horizontal</code></td>
-    </tr>
-    <tr>
-      <td><code>top-threshold</code></td>
-      <td>Number</td>
-      <td>0</td>
-      <td>The threshold to emit <code>totop</code> event, attention to multiple calls.</td>
-    </tr>
-    <tr>
-      <td><code>bottom-threshold</code></td>
-      <td>Number</td>
-      <td>0</td>
-      <td>The threshold to emit <code>tobottom</code> event, attention to multiple calls.</td>
+      <td><code>footer-style</code></td>
+      <td>Object</td>
+      <td>{}</td>
+      <td>For using using footer slot, footer slot wrapper element inline style.</td>
     </tr>
   </table>
 </details>
 
 ### Public methods
 
-Here are some usefull public methods you can call via [`ref`](https://vuejs.org/v2/guide/components-edge-cases.html#Accessing-Child-Component-Instances-amp-Child-Elements):
-
-* `reset()`: reset all state back to initial.
-
-* `scrollToBottom()`: manual set scroll position to bottom.
-
-* `scrollToIndex(index)`: manual set scroll position to a designated index.
-
-* `scrollToOffset(offset)`: manual set scroll position to a designated offset.
-
-* `getSize(id)`: get the designated item size by id (from data-key value).
-
-* `getSizes()`: get the total number of stored (rendered) items.
-
-* `getOffset()`: get current scroll offset.
-
-* `getClientSize()`: get wrapper element client viewport size (width or height).
-
-* `getScrollSize()`: get all scroll size (scrollHeight or scrollWidth).
+<details>
+  <summary><strong>Usefull public methods</strong></summary>
+  <p></p>
+  <p>You can call these methods via <code><a href="https://vuejs.org/v2/guide/components-edge-cases.html#Accessing-Child-Component-Instances-amp-Child-Elements">ref</a></code>:</p>
+  <table>
+    <tr>
+      <th>Method</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td><code>reset()</code></td>
+      <td>Reset all state back to initial.</td>
+    </tr>
+    <tr>
+      <td><code>scrollToBottom()</code></td>
+      <td>Manual set scroll position to bottom.</td>
+    </tr>
+    <tr>
+      <td><code>scrollToIndex(index)</code></td>
+      <td>Manual set scroll position to a designated index.</td>
+    </tr>
+    <tr>
+      <td><code>scrollToOffset(offset)</code></td>
+      <td>Manual set scroll position to a designated offset.</td>
+    </tr>
+    <tr>
+      <td><code>getSize(id)</code></td>
+      <td>Get the designated item size by id (from <code>data-key</code> value).</td>
+    </tr>
+    <tr>
+      <td><code>getSizes()</code></td>
+      <td>Get the total number of stored (rendered) items.</td>
+    </tr>
+    <tr>
+      <td><code>getOffset()</code></td>
+      <td>Get current scroll offset.</td>
+    </tr>
+    <tr>
+      <td><code>getClientSize()</code></td>
+      <td>Get wrapper element client viewport size (width or height).</td>
+    </tr>
+    <tr>
+      <td><code>getScrollSize()</code></td>
+      <td>Get all scroll size (scrollHeight or scrollWidth).</td>
+    </tr>
+  </table>
+</details>
 
 
 ## Attentions

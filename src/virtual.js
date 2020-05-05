@@ -70,11 +70,19 @@ export default class Virtual {
 
   // return start index offset
   getOffset (start) {
-    return start < 1 ? 0 : this.getIndexOffset(start)
+    return (start < 1 ? 0 : this.getIndexOffset(start)) + this.param.slotHeaderSize
   }
 
   updateParam (key, value) {
     if (this.param && (key in this.param)) {
+      // if uniqueIds reducing, find out deleted id and remove from size map
+      if (key === 'uniqueIds' && (value.length < this.param[key].length)) {
+        this.sizes.forEach((v, key) => {
+          if (!value.includes(key)) {
+            this.sizes.delete(key)
+          }
+        })
+      }
       this.param[key] = value
     }
   }
@@ -295,6 +303,6 @@ export default class Virtual {
 
   // get the item estimate size
   getEstimateSize () {
-    return this.firstRangeAverageSize || this.param.size
+    return this.firstRangeAverageSize || this.param.estimateSize
   }
 }

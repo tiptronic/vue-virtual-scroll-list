@@ -67,6 +67,19 @@ const VirtualList = Vue.component('virtual-list', {
     } else if (this.offset) {
       this.scrollToOffset(this.offset)
     }
+
+    // in page mode we bind scroll event to document
+    if (this.pageMode) {
+      document.addEventListener('scroll', this.onScroll, {
+        passive: false
+      })
+
+      // taking root offsetTop or offsetLeft as slot header size
+      const { root } = this.$refs
+      if (root) {
+        this.virtual.updateParam('slotHeaderSize', root[this.isHorizontal ? 'offsetLeft' : 'offsetTop'])
+      }
+    }
   },
 
   beforeDestroy () {
@@ -86,27 +99,45 @@ const VirtualList = Vue.component('virtual-list', {
 
     // return current scroll offset
     getOffset () {
-      const { root } = this.$refs
-      return root ? Math.ceil(root[this.directionKey]) : 0
+      if (this.pageMode) {
+        return document.documentElement[this.directionKey]
+      } else {
+        const { root } = this.$refs
+        return root ? Math.ceil(root[this.directionKey]) : 0
+      }
     },
 
     // return client viewport size
     getClientSize () {
-      const { root } = this.$refs
-      return root ? root[this.isHorizontal ? 'clientWidth' : 'clientHeight'] : 0
+      const key = this.isHorizontal ? 'clientWidth' : 'clientHeight'
+      if (this.pageMode) {
+        return document.documentElement[key]
+      } else {
+        const { root } = this.$refs
+        return root ? root[key] : 0
+      }
     },
 
     // return all scroll size
     getScrollSize () {
-      const { root } = this.$refs
-      return root ? root[this.isHorizontal ? 'scrollWidth' : 'scrollHeight'] : 0
+      const key = this.isHorizontal ? 'scrollWidth' : 'scrollHeight'
+      if (this.pageMode) {
+        return document.documentElement[key]
+      } else {
+        const { root } = this.$refs
+        return root ? root[key] : 0
+      }
     },
 
     // set current scroll position to a expectant offset
     scrollToOffset (offset) {
-      const { root } = this.$refs
-      if (root) {
-        root[this.directionKey] = offset || 0
+      if (this.pageMode) {
+        document.documentElement[this.directionKey] = offset
+      } else {
+        const { root } = this.$refs
+        if (root) {
+          root[this.directionKey] = offset
+        }
       }
     },
 
@@ -125,7 +156,8 @@ const VirtualList = Vue.component('virtual-list', {
     scrollToBottom () {
       const { shepherd } = this.$refs
       if (shepherd) {
-        shepherd.scrollIntoView(false)
+        const offset = shepherd[this.isHorizontal ? 'offsetLeft' : 'offsetTop']
+        this.scrollToOffset(offset)
 
         // check if it's really scrolled to the bottom
         // maybe list doesn't render and calculate to last range
@@ -149,10 +181,10 @@ const VirtualList = Vue.component('virtual-list', {
 
     installVirtual () {
       this.virtual = new Virtual({
-        size: this.size, // also could be a estimate value
         slotHeaderSize: 0,
         slotFooterSize: 0,
         keeps: this.keeps,
+        estimateSize: this.estimateSize,
         buffer: Math.round(this.keeps / 3), // recommend for a third of keeps
         uniqueIds: this.getUniqueIdFromDataSources()
       }, this.onRangeChanged)
@@ -220,11 +252,11 @@ const VirtualList = Vue.component('virtual-list', {
     getRenderSlots (h) {
       const slots = []
       const { start, end } = this.range
-      const { dataSources, dataKey, itemClass, itemTag, isHorizontal, extraProps, dataComponent } = this
+      const { dataSources, dataKey, itemClass, itemTag, itemStyle, isHorizontal, extraProps, dataComponent } = this
       for (let index = start; index <= end; index++) {
         const dataSource = dataSources[index]
         if (dataSource) {
-          if (dataSource[dataKey]) {
+          if (Object.prototype.hasOwnProperty.call(dataSource, dataKey)) {
             slots.push(h(Item, {
               props: {
                 index,
@@ -236,7 +268,8 @@ const VirtualList = Vue.component('virtual-list', {
                 extraProps: extraProps,
                 component: dataComponent
               },
-              class: `${itemClass} ${this.itemClassAdd ? this.itemClassAdd(index) : ''}`
+              style: itemStyle,
+              class: `${itemClass}${this.itemClassAdd ? ' ' + this.itemClassAdd(index) : ''}`
             }))
           } else {
             console.warn(`Cannot get the data-key '${dataKey}' from data-sources.`)
@@ -254,18 +287,20 @@ const VirtualList = Vue.component('virtual-list', {
   render (h) {
     const { header, footer } = this.$slots
     const { padFront, padBehind } = this.range
-    const { rootTag, headerClass, headerTag, wrapTag, wrapClass, footerClass, footerTag } = this
-    const padding = this.isHorizontal ? `0px ${padBehind}px 0px ${padFront}px` : `${padFront}px 0px ${padBehind}px`
+    const { isHorizontal, pageMode, rootTag, wrapTag, wrapClass, wrapStyle, headerTag, headerClass, headerStyle, footerTag, footerClass, footerStyle } = this
+    const paddingStyle = { padding: isHorizontal ? `0px ${padBehind}px 0px ${padFront}px` : `${padFront}px 0px ${padBehind}px` }
+    const wrapperStyle = wrapStyle ? Object.assign({}, wrapStyle, paddingStyle) : paddingStyle
 
     return h(rootTag, {
       ref: 'root',
       on: {
-        '&scroll': this.onScroll
+        '&scroll': !pageMode && this.onScroll
       }
     }, [
       // header slot
       header ? h(Slot, {
         class: headerClass,
+        style: headerStyle,
         props: {
           tag: headerTag,
           event: EVENT_TYPE.SLOT,
@@ -279,14 +314,13 @@ const VirtualList = Vue.component('virtual-list', {
         attrs: {
           role: 'group'
         },
-        style: {
-          padding: padding
-        }
+        style: wrapperStyle
       }, this.getRenderSlots(h)),
 
       // footer slot
       footer ? h(Slot, {
         class: footerClass,
+        style: footerStyle,
         props: {
           tag: footerTag,
           event: EVENT_TYPE.SLOT,
@@ -296,7 +330,11 @@ const VirtualList = Vue.component('virtual-list', {
 
       // an empty element use to scroll to bottom
       h('div', {
-        ref: 'shepherd'
+        ref: 'shepherd',
+        style: {
+          width: isHorizontal ? '0px' : '100%',
+          height: isHorizontal ? '100%' : '0px'
+        }
       })
     ])
   }

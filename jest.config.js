@@ -1,16 +1,24 @@
 module.exports = {
   transformIgnorePatterns: [
-    'node_modules'
+    '<rootDir>/node_modules'
   ],
   collectCoverage: true,
-  coverageDirectory: './coverage',
+  coverageDirectory: '<rootDir>/coverage',
   coverageReporters: [
     'lcov',
     'html',
     'text-summary',
   ],
   collectCoverageFrom: [
-    'src/index.js'
+    '<rootDir>/src/*.js'
   ],
-  // testRegex: '/test/base.test.js?$'
+  moduleFileExtensions: [
+    'js',
+    'vue'
+  ],
+  transform: {
+    '.*\\.(vue)$': 'vue-jest',
+    '^.+\\.js$': '<rootDir>/node_modules/babel-jest'
+  },
+  // testRegex: 'scroll.test.js?$'
 }
